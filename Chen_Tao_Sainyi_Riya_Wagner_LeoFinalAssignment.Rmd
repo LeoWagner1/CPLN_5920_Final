@@ -14,43 +14,27 @@ editor_options:
     wrap: 72
 ---
 
-# Notes
-
-[Fichman & co's
-paper](https://urbanspatialanalysis.com/portfolio/predicting-gentrification-using-longitudinal-census-data/)
-centers around housing price as the proxy for predicting change. They
-use 1990 and 2000 Census data on home prices to predict home prices in
-2010. If those models prove robust, we can use the model to forecast for
-2020.
-
-Pew's 3 criteria from their [2016
-report](https://www.pewtrusts.org/en/research-and-analysis/reports/2016/05/philadelphias-changing-neighborhoods),
-tracking gentrification in Philadelphia between 2010 and 2014:
-
--   In order to be considered gentrified, a census tract needed a median
-    household income in 2000 below 80 percent of regional median income,
-    53,992 dollars, the threshold set by the federal government to
-    determine eligibility for housing assistance and other programs
-    aimed at low-income households
--   The tract’s median income had to have increased at least 10 percent
-    in inflation-adjusted dollars from 2000 to 2014, a period in which
-    the median income of the city as a whole actually fell by about 10
-    percent
--   Its 2014 median household income figure had to exceed the citywide
-    median of 37,460 dollars.
-
 # Introduction
 
-We use a similar metric to that used by Fichman et al., primarily using
-median house value and its geospatial metrics, while taking into account
-other factors along the way.
+For many years, the American city was focused on reversing population decline, lowered property values, and the negative ramifications for municipal finance that this entailed. Today, however, American cities, particularly those of the Northeast, are in some ways victims of their own success, with concerns of displacement of long-time residents due to rising property values and competition for limited housing supply (with creation of new housing often artificially constrained by outdated zoning codes). This concern of displacement combined with observations of cultural change owing to new residents' differing backgrounds (be it education levels, race/ethnicity, socioeconomic status, etc.) have led to a broader concern around gentrification.
 
-We use 2010 and 2014 Philadelphia data to predict house prices in 2018.
-Then the model is tested on Baltimore. These years are chosen to ensure
-that the census tracts stay the same, making comparisons easier. Of
-course, if a good model is found, other years can be compared.
+Understanding where and when gentrification is likely to strike, however, can be a key tool in addressing its negative externalities, though is wrought with difficulty. Firstly, anticipating gentrification enables municipalities to proactively plan for equitable development and mitigate potential negative consequences such as displacement and social exclusion. By identifying areas at risk of gentrification, policymakers can implement targeted interventions to support vulnerable communities and preserve affordable housing stock. Secondly, predictive models provide valuable insights into the underlying drivers and dynamics of gentrification, informing evidence-based policy decisions and resource allocation. Understanding the spatial and temporal patterns of gentrification empowers cities to tailor interventions to the unique characteristics of each neighborhood, fostering inclusive growth and social cohesion. Moreover, early detection of gentrification hotspots allows for strategic investment in infrastructure, amenities, and community resources to promote sustainable development and enhance residents' quality of life. Overall, leveraging predictive modeling to evaluate future gentrification not only serves as a proactive approach to urban planning but also contributes to fostering resilient, inclusive, and vibrant cities for all residents.
 
-We use 2010 prices as a standard to account for inflation.
+Gentrification is a term laden with varied interpretations, shaped by the perspectives and experiences of different stakeholders. While definitions may vary widely, median home values have emerged as a valuable proxy for understanding this complex phenomenon, particularly within the scholarly discourse. This metric captures shifts in neighborhood demographics, economic transformation, and housing market dynamics, all central to the process of gentrification. Empirical studies often rely on changes in median home values as a quantifiable indicator, reflecting the influx of higher-income residents, increased property investment, and subsequent displacement of lower-income households—a hallmark of gentrification. Despite ongoing debates surrounding its conceptualization and impacts, the use of median home values offers researchers and policymakers a tangible measure to track and analyze the multifaceted dimensions of gentrification over time.
+
+# Background
+
+This analysis is based off of research done by [Fichman et al.](https://urbanspatialanalysis.com/portfolio/predicting-gentrification-using-longitudinal-census-data/) which centers around housing price as the proxy for predicting change. They use 1990 and 2000 Census data on home prices to predict home prices in 2010. If those models prove robust, this research can use the model to forecast for 2018 based on 2010 data.
+
+Pew's three criteria from their [2016 report](https://www.pewtrusts.org/en/research-and-analysis/reports/2016/05/philadelphias-changing-neighborhoods) tracking gentrification in Philadelphia between 2010 and 2014, are used as an important baseline for the addition of variables to the model:
+
+-   In order to be considered gentrified, a census tract needed a median household income in 2000 below 80 percent of regional median income, 53,992 dollars, the threshold set by the federal government to determine eligibility for housing assistance and other programs aimed at low-income households
+-   The tract’s median income had to have increased at least 10 percent in inflation-adjusted dollars from 2000 to 2014, a period in which the median income of the city as a whole actually fell by about 10 percent
+-   Its 2014 median household income figure had to exceed the citywide median of 37,460 dollars.
+
+The report uses a similar metric to that used by Fichman et al., primarily using median house value and its geospatial metrics, while taking into account other factors along the way.
+
+The report uses 2010 and 2014 Philadelphia data to predict house prices in 2018. Then the model is tested on Baltimore. These years are chosen to ensure that the census tracts stay the same, making comparisons easier. Of course, if a good model is found, other years can be compared.
 
 # Set Up
 
@@ -93,10 +77,11 @@ v10 <- load_variables(2010, "acs5", cache = TRUE)
 
 # Data Collection
 
-Calculation for inflation is done using the [Bureau of Labor Statistics'
-resources](https://data.bls.gov/cgi-bin/cpicalc.pl?cost1=10.00&year1=201001&year2=201501)
+Calculation for inflation is done using the [Bureau of Labor Statistics' resources](https://data.bls.gov/cgi-bin/cpicalc.pl?cost1=10.00&year1=201001&year2=201501). 2010 prices are used as a standard to account for inflation.
 
 ## Philadelphia Data
+
+Data for Philadelphia is processed using information from the American Community Survey.
 
 ```{r data acquiring}
 # Define function to retrieve and process ACS data
@@ -163,14 +148,13 @@ Philly_combined <- rbind(transform(Philly2010, year = 2010),
 
 ```
 
-# Quick Look
+# Data Profile
 
-Discuss what we're doing here
+In order to get a better understanding of how factors key to gentrification are spatially distributed throughout Philadelphia, several maps are created.
 
 ## Median House Value
 
-Discuss what this is going to show -- primary component of Fichman et
-al. paper
+Median home value serves as a valuable proxy for gentrification due to its ability to capture key aspects of the phenomenon. As neighborhoods experience gentrification, there tends to be a discernible increase in property values, often driven by influxes of higher-income residents, investments in housing stock, and revitalization efforts. These changes are reflected in rising median home values, making it an accessible and quantifiable indicator of neighborhood transformation. Furthermore, median home value encapsulates broader socioeconomic shifts, such as shifts in demographic composition and changes in neighborhood amenities and infrastructure, which are characteristic of gentrifying areas. As a result, analyzing changes in median home values over time provides insight into the spatial and temporal patterns of gentrification, facilitating both academic research and urban policy interventions aimed at addressing its impacts. Before looking at how effectively particular distinct variables affect median home values, first their distribution in Philadelphia should be understood.
 
 ```{r map 1, warning=FALSE}
 
@@ -188,15 +172,16 @@ ggplot(Philly_combined, aes(fill = Med_House_Val)) +
         axis.ticks = element_blank(),
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        plot.subtitle = element_text(size = 9, face = "italic"),
+        plot.subtitle = element_blank(),
         plot.title = element_text(size = 12, face = "bold"),
         panel.background = element_blank(),
         panel.border = element_rect(colour = "#F5f5f5", fill = NA, linewidth = 0.8)) +
   facet_wrap(~year, nrow = 1)
 
 ```
+Overall, high-value home Tracts are clustered in Center City, regardless of year, while portions of the upper-northwest (such as Chestnut Hill) which were already high-value in 2010 showed notable increase by 2014, as did corresponding sections of West Philadelphia. Middle-value neighborhoods in the upper Northeast and eastern South Philadelphia remained largely the same in their distribution from 2010 to 2014. Low-value neighborhoods continued to remain in far West and Southwest Philadelphia, as well as in central North Philadelphia.
 
-Discuss additional nuance examining price distribution is going to add
+Examining the distribution of home values, particularly the prevalence of high versus low values, across multiple years such as 2010, 2014, and 2018, provides nuanced insights into the trajectory of neighborhood change in Philadelphia. This analysis not only reveals changes in median home values but also sheds light on spatial patterns of gentrification, urban development dynamics, and disparities in housing affordability over time, enriching understanding of the city's evolving socioeconomic landscape.
 
 ```{r housing price distribution, warning=FALSE}
 Philly_housingprice <- rbind(transform(Philly2010, year = 2010), 
@@ -212,15 +197,13 @@ ggplot(Philly_housingprice, aes(x = factor(year), y = Med_House_Val, fill = fact
   stat_summary(fun.y = median, geom = "point", size = 2, color = "white")
 ```
 
-Discuss findings While the median has not changed much, note the spike
-in the peak home value in 2018. The area around 100,000 dollars also
-thinned out significantly.
+While the median (represented by the white circle in the graph above) has not changed much, note the spike in the peak home value in 2018. The area around 100,000 dollars also thinned out significantly. Over the course of the eight years the number of homes sold for under $250,000 lost a secondary clustering of approximately 200,000, with increasing upper-level outliers. An uptick in price for the (albeit small) upper-level home price concentration is also observed, from USD500,000 to USD600,000.
 
 ## White Population Percentage
 
-Why we include this--incl. article link potentially to show significance
+Analyzing the percentage of white population in Census tracts for both 2010 and 2014 offers a comprehensive view of gentrification dynamics over time. Comparing these demographic shifts provides insights into the patterns of racial and ethnic change associated with gentrification, including the displacement of historically marginalized communities and the influx of more affluent residents. Additionally, examining changes in the racial composition of neighborhoods helps identify areas experiencing gentrification, where increases in white population often coincide with rising property values and shifts in neighborhood amenities. Therefore, understanding how this key racial element of gentrification relates spatially to the proxy variable used in this study, median home values, is key to understanding model performance once tract racial composition variables are incorporated into the model.
 
-```{r map 1}
+```{r map 2}
 ggplot(Philly_combined, aes(fill = White_Share)) +
   geom_sf() +
   scale_fill_viridis_c(labels = scales::label_number(), 
@@ -243,10 +226,11 @@ ggplot(Philly_combined, aes(fill = White_Share)) +
 
 ```
 
-Discuss findings--decline in % in some tracts in the Northeast, growth
-in % in Grays Ferry/Point Breeze, lower North Philadelphia
+Philadelphia's white population is concentrated in the Northwest, portions of the upper Northeast, CenterCity, and eastern South Philadelphia and the River Wards in both years. Notably, however, from 2010 to 2014 there is a decline in tracts' white population percentages in some tracts in the Northeast, and a growth in this figure in Grays Ferry/Point Breeze, as well as portions of lower North Philadelphia.
 
 ## Philadelphia 2010-2014 Changes
+
+Understanding the distribution of median home value changes by Census tract from 2010 to 2014 is crucial for gaining insights into the localized impacts of gentrification. Examining these changes at a granular level allows for the identification of specific neighborhoods experiencing rapid appreciation in property values, a hallmark of gentrification. Moreover, analyzing the variability in these changes across Census tracts provides valuable information on the spatial patterns of gentrification, highlighting areas undergoing socioeconomic transformation and potential displacement pressures given that gentrification hinges on neighborhood change. Understanding the degree of change of median home values for different areas is thus essential.
 
 ```{r PhillyChange Table 1}
 Philly10to14 <- Philly_combined %>%
@@ -284,8 +268,7 @@ Philly10to14 <- Philly10to14 %>%
          -White_Share)
 ```
 
-Connect median house value to home value *change* and how this is
-significant
+Spatially, the results can be seen below.
 
 ```{r Philly Change Map 1}
 ggplot(Philly10to14, aes(fill = Med_House_Val_PctChange)) +
@@ -310,22 +293,20 @@ ggplot(Philly10to14, aes(fill = Med_House_Val_PctChange)) +
 
 ```
 
-Discuss results, when compared with median house values and white
-population in 2010 and 2014 areas with extremely cheap houses and very
-low percentage of white residents saw the greatest *percentage* increase
-in house values--largely north-central Philadelphia in areas close to
-existing "creative class" Center City-adjacent areas, such as Fairmount,
-with some affects of the widening sphere of influence of Temple U as
-well. (partially explained by law of diminishing marginal returns)
+When compared with median house values and Census tracts' white population in 2010 and 2014, areas with extremely cheap houses and very low percentage of white residents saw the greatest *percentage* increase
+in house values. These areas consisted largely of central North Philadelphia in areas close to existing "creative class" Center City-adjacent areas, such as Fairmount, with some effects of the widening sphere of influence of Temple U as well. The outsized appearance of percentage change in these areas is partially explained by law of diminishing marginal returns, as starting from a very low median home value means an increase of this value by, for example, $25,000 (as a sign of early broader-market interest in the area) will be far more significant as a percentage change than that same median value increase in an already high-value area like Rittenhouse Square.
 
 # Data Wrangling
 
+Next, the spatial autocorrelation of Census tracts and presence of collinear variables among the independent variables used to measure gentrification need to be explored before model creation for better evaluation (model evaluating gentrification by using median home values). When spatial autocorrelation is present in the data, it violates the assumption of independent observations, which is a key assumption of linear regression. This can lead to biased parameter estimates, inflated standard errors, and incorrect inference about the relationships between variables. Additionally, spatial autocorrelation can result in multicollinearity among predictors, as neighboring observations tend to have similar values, potentially leading to instability in the estimated coefficients and reduced predictive accuracy of the model. Therefore, accounting for spatial autocorrelation through appropriate model specification, such as incorporating spatial lag terms, is essential to improve the robustness and reliability of multivariate linear regression models in spatial data analysis.
+
 ## Spatial Lag
 
-The following deals with median house value. In 2010's data, there are
-only 366 obs as opposed to 384 obs. A few tracts do not have median home
-values. This will appear as "Philly2010Lag"; 2014 data will be joined as
-"Philly2010Lag14".
+Spatial lag is a concept used in spatial analysis and spatial econometrics to account for spatial dependencies in data. It refers to a new variable that represents the average value of a particular variable for neighboring spatial units, in this case neighboring Census tracts. In other words, the spatial lag of a variable, such as home values, for a specific Census tract is the average value of that variable for neighboring tracts. This allows one to capture the spatial autocorrelation or spatial dependence present in the data. Here, this is important due to the theory of [endogenous gentrification,](http://www.nber.org/papers/w16237) which states that neighborhoods close to high-amenity, expensive ones will gentrify earlier due to this proximity than those further away from existing centers of wealth and investment.
+
+Spatial lag is often used in regression analysis to account for spatial dependencies among observations. Including the spatial lag of a variable as an additional predictor in a regression model helps to control for spatial autocorrelation and can improve the model's accuracy and interpretability, especially when the dependent variable exhibits spatial patterns.
+
+The following deals with median house value. In 2010's data, there are only 366 observations as opposed to 384 observations. A few tracts do not have median home values. This will appear as "Philly2010Lag"; 2014 data will be joined as "Philly2010Lag14".
 
 ```{r data wrangling spatial lag}
 # Replace non-finite values with NA
@@ -370,40 +351,13 @@ ggplot(Philly2010Lag14, aes(x = NborHouseVal, y = Med_House_Val_2014)) +
 
 ```
 
-The Moran’s I coefficient is 0.74. The positive (upward) slope suggests
-that as the house value of a said polygon increases, so does those of
-its neighboring polygons.
+The graph above depicts a fairly strong relationship between a tract's median 2014 home value, and the "spatial lag" of 2010 home values for that tract (again, the average home values of neighboring tracts). This supports the theory of endogenous gentrification in Philadelphia. To this point, the Moran’s I coefficient for the data is 0.74. Moran's I is a statistic used in spatial analysis to measure the degree of spatial autocorrelation in a dataset. It quantifies the similarity between neighboring observations, helping to identify patterns of clustering or dispersion in spatially referenced data. The positive (upward) slope suggests that as the house value of a said polygon increases, so does those of its neighboring polygons.
 
 ## Moran's I
 
-(The following is taken from Fichman & Co's page) There are three local
-spatial patterns of home prices that we are interested in: clustering of
-high prices; clustering of low prices; and spatial randomness of prices.
+In a similar vein, local Moran's I is a statistic used in spatial analysis to measure the spatial autocorrelation of a variable across neighboring locations. It assesses whether similar values are clustered together (positive spatial autocorrelation) or dispersed (negative spatial autocorrelation) in space, providing insights into localized patterns of similarity or dissimilarity in the data. This figure can be used, together with p values and "significant hotspots," to understand local clustering of values. Local clustering of high and low housing prices suggests that housing market participants, from developers to real estate agents to everyday buyers and sellers, collectively agree on equilibrium prices within a given neighborhood. In other words, the neighborhood is generally understood to be low or high value. Conversely, local randomness in price distribution indicates a neighborhood in transition, potentially indicating an imbalance in the market (i.e., oftentimes gentrification). In neighborhoods experiencing change, uncertainty about future amenities can lead to heterogeneous pricing patterns, reflecting varying expectations among buyers and sellers. It may  also be indicative of many properties with distinct amenities (e.g., those of shoddier, older construction, and recently-renovated and brand-new construction buildings), or of hyperlocal variation within a Census tract (i.e. some portions are attractive to wealthier prospective buyers and renters, but not all). Both these patterns can be indicative of gentrification and displacement. Evaluating local Moran's I is essential in this context as it helps identify spatial trends in housing prices, distinguishing between areas in equilibrium and those undergoing transition. Homogeneous prices signify stability and should indicate high local Moran's I values if this is similar in neighboring areas, where market participants share similar expectations, while heterogeneous prices indicate a neighborhood in flux, where uncertainty about future developments influences pricing decisions. The latter should, if the condition is found across multiple Census tracts, indicate low local Moran's I.
 
-Local clustering of high and low prices suggests that housing market
-agents agree on equilibrium prices in a given neighborhood. Local
-randomness, we argue, is indicative of a changing neighborhood – one
-that is out of equilibrium.
-
-In a changing neighborhood, buyers and sellers are unable to predict the
-value of future amenities. Our theory argues that when this uncertainty
-is capitalized into prices, the result is a heterogeneous pattern of
-prices across space. Capturing this spatial trend is crucial for
-forecasting neighborhood change.
-
---LEO: also indicative of many properties with distinct amenities (e.g.,
-those of shoddier, older construction, and recently-renovated and
-brand-new construction buildings), or of hyperlocal variation within a
-Census tract (i.e. some portions are attractive to wealthier prospective
-buyers and renters, but not all). Both these patterns indicative of
-displacement
-
-Homogeneous prices in the are indicative of an area in equilibrium where
-all housing market agents agree on future expectations. Heterogeneous
-prices is more indicative of a neighborhood in flux – one where housing
-market agents are capitalizing an uncertain future into prices.
-
-```{r local moran's}
+```{r, echo = FALSE, 'local moran\'s' = TRUE}
 ## {spdep} to make polygon to neighborhoods... 
 Phil2010.nb <- poly2nb(as_Spatial(Philly2010Lag), queen=TRUE)
 ## ... and neighborhoods to list of weigths
@@ -439,7 +393,7 @@ Philly2010.LocalMorans1 <- Philly2010.LMoransList1%>%
 
 ```
 
-```{r plotting local moran's}
+```{r, echo = FALSE, 'plotting local moran\'s' = TRUE}
 ## This is just for plotting
 Philly2010MoransPlot <- unique(Philly2010.LocalMorans1$Variable)
 PhillyMoransList <- list()
@@ -458,11 +412,15 @@ for(i in Philly2010MoransPlot){
 do.call(grid.arrange,c(PhillyMoransList, ncol = 4, top = "Local Morans I statistics, Philadelphia 2010 Median Home Value"))
 ```
 
-Interpretation of chart elements: see Assignment 4
+Higher local Moran's I values are predominantly found in larger, uninterrupted portions of high or low median home value tracts, such as central North Philadelphia, the southern half of Center City, or Chestnut Hill. This is particularly true with areas of uninterrupted high median home values.
 
-Moran's I correlation--why this is included
+The p-values of these results depict the statistical significance of each tract’s local Moran’s I value, or the likelihood that such a value would be observed under spatial randomness. In much of the city, the highest p-values, indicating lower statistical significance, are in areas with some early signs of gentrification (e.g., slightly higher median home values), but not in the areas of the highest median home values. This frequently occurs in areas just beyond the current "front lines" of gentrification, where early stage gentrification may be taking place. The  western portion of the Baltimore Avenue corridor in West Philadelphia or the Brewerytown-Strawberry Mansion area of North Philadelphia are examples of this. This may be due to variability in the spatial distribution of median home values. Areas with mixed land uses (i.e., some larger homes and some smaller ones, which would influence median home values), socioeconomic characteristics, or patterns of investment may exhibit spatial heterogeneity, influencing the significance of observed spatial patterns.
 
-```{r moran's correlation}
+A “significant hotspot” refers to a spatial cluster of high values that is statistically significant, thus relying on both local Moran’s I and p-values in their identification. The areas with a large and particularly intense areas of very low or very high median home values (and thus lower local Moran's I values) as identified by a cursory analysis are largely those identified as significant hotspots, with a strong spatial relationship identified by their high Moran’s I values and their low p-values showing that the data’s distribution is of statistical significance.
+
+Measuring the correlation between local Moran's I in 2010 and median home prices in 2014 by Census tract offers insights into the persistence and spatial dynamics of neighborhood change over time. A positive correlation suggests that areas exhibiting high levels of spatial clustering or dispersion in 2010 were likely to experience similar patterns of change in median home prices by 2014, indicating spatial continuity in the underlying factors driving gentrification or urban transformation. Conversely, a negative correlation may indicate shifts in spatial dynamics or the emergence of new patterns of neighborhood change, highlighting areas where interventions or policy responses may be warranted to address evolving socioeconomic disparities.
+
+```{r, echo = FALSE, 'moran\'s correlation' = TRUE}
 Philly2010Lag14 <- left_join(Philly2010Lag14, Philly2010.LMoransList, by = "GEOID")
 
 Philly2010Lag14 <- Philly2010Lag14 %>%
@@ -480,11 +438,11 @@ ggplot(Philly2010Lag14, aes(x = P_Value, y = Med_House_Val_2014)) +
   theme_minimal()
 ```
 
-results of this correlation
+The observation of a very slight negative correlation between these variables suggests nuanced spatial dynamics within the dataset. While the negative correlation indicates a tendency for areas with higher levels of spatial clustering or dispersion in 2010 to experience slightly lower median home prices than the area average by 2014 (likely due to the sheer quantity of relatively low-value neighborhoods that are clustered in comparatively-large swaths of the city), the strength of this relationship may be relatively weak. This finding could imply localized variations in gentrification processes or the influence of other factors shaping housing market dynamics over time, warranting further investigation into the specific drivers and mechanisms underlying the observed spatial patterns.
 
-Before developing the Ordinary Least Squared Regression model, lets look
-at the Correlation Matrix. (talk about correlation matrix- values close
-to 1 and -1 should be omitted).
+## Correlation Matrix
+
+Before developing the Ordinary Least Squared Regression model, a correlation matrix involving a host of independent variables, often influential on median home values for an area, is created. On one hand, this identifies variables with strong correlation to median home value for inclusion in the model. On the other hand, this is done to identify variables that are collinear with one another (i.e., with values close to 1 and -1) to omit owing to their negative effects on model accuracy, as it becomes difficult for the model to accurately discern which variable is responsible for effects on median home value.
 
 ```{r correlation matrix, fig.height=12, fig.width=12}
 
@@ -520,20 +478,11 @@ dat18.Numeric %>%
   geom_text(aes(label = round(r,digits=2)),size = 1)
 ```
 
-OLS Regression The purpose of Linear Regression or Ordinary Least
-Squares Regression (OLS), is to predict the Median Household Value of
-house in 2018, as a function of several components. A step-wise
-regression model based on addition and deletion of variables based on
-its p-value and contribution to the model's predictive power has been
-created. The goodness of fit of the model was ascertained using measures
-such as the Variance inflation factor, AIC and BIC. For the two most
-competitive regression models, an anova test or Analysis of Variance was
-conducted to test the overall significance of a regression model. In
-this case, Regression Model 2 has a significantly lower RSS (Residual
-Sum of Squares) compared to Model 1, which is reflected in the large
-difference in the sum of squares between the two models. Additionally,
-Model 2 has a significant F-value, with a p-value close to 0, indicating
-that the model is statistically significant.
+The principal conclusion of the matrix is similar to that found in the analysis of Moran's I: Often, median house values in 2010 and 2014 are highly correlated with one another, as are other indicative variables' 2010 and 2014 values (such as median household income, the number of white people in a neighborhood, median rent, or the population with a bachelor's degree or higher). Therefore, the variables representing change, or percent change, from 2010 to 2014 are typically chosen of the options available.
+
+# Model Evaluation: OLS Regression
+
+OLS Regression The purpose of Linear Regression or Ordinary Least Squares Regression (OLS), is to predict the Median Household Value of homes in Census tracts in 2018, as a function of several components. A step-wise regression model based on addition and deletion of variables based on their p-value and contribution to the model's predictive power has been created. The goodness of fit of the model was ascertained using measures such as the Variance inflation factor, AIC and BIC. For the two most competitive regression models, an anova test or Analysis of Variance was conducted to test the overall significance of a regression model. In this case, Regression Model 2 has a significantly lower RSS (Residual Sum of Squares) compared to Model 1, which is reflected in the large difference in the sum of squares between the two models. Additionally, Model 2 has a significant F-value, with a p-value close to 0, indicating that the model is statistically significant.
 
 ```{r regression, message=FALSE, warning=FALSE, echo=FALSE}
 # reg1, AIC, BIC, VIF, ANOVA can be deleted if need be. 
@@ -560,7 +509,19 @@ BIC(reg2)
 anova(reg1, reg2)
 ```
 
-K-fold Cross Validation
+The Akaike Information Criterion (AIC) of 8656.011 is a measure of the relative quality of a statistical model, balancing goodness of fit and model complexity, with lower values indicating a better fit.
+
+The Bayesian Information Criterion (BIC) of 8706.602 is similar to AIC but penalizes model complexity more heavily, providing a more conservative assessment of model fit.
+
+The adjusted R-squared value of 0.916 represents the proportion of variability in the response variable explained by the model, adjusted for the number of predictors, with higher values indicating better explanatory power. This indicates that over 90% of the data's variation can be explained by the model.
+
+The Residual Standard Error of USD36,968.510 (with 350 degrees of freedom) quantifies the average deviation of observed values from the predicted values by the model, with lower values indicating better model precision.
+
+Interpreting these results, the model demonstrates strong explanatory power (as indicated by the high adjusted R-squared value of 0.916), suggesting that it effectively captures the variability in the response variable. Additionally, the relatively low AIC and BIC values suggest that the model is competitive compared to alternative models, while the Residual Standard Error indicates that the model has a moderate level of precision in predicting 2018 median home values by Census tract.
+
+## K-fold Cross Validation
+
+K-fold cross-validation is a resampling technique used to assess the performance and generalization capability of a predictive model. In this method, the dataset is partitioned into K subsets, or folds, with the model trained K times, each time using K-1 folds for training and one fold for validation. By repeating this process for each fold and averaging the results, K-fold cross-validation provides a robust estimate of the model's predictive performance. Conducting K-fold cross-validation is crucial for evaluating this multivariate linear regression model predicting 2018 median home values with 2010 and 2014 data because it allows for rigorous testing of the model's ability to generalize to new, unseen data. This approach helps to mitigate overfitting and assesses the model's reliability in capturing temporal trends and dynamics in housing market variables over time.
 
 ```{r}
 set.seed(123)
@@ -586,15 +547,11 @@ lm_cv <- train(Med_House_Val ~ . - Total_Pop_2010 - White_Pop_2010 - BachelorsDe
 
 print(lm_cv)
 ```
+The results of the cross-validation test remain quite strong. The Mean Absolute Error, or the difference between predicted and observed median home price values for a neighborhood, is USD23,762.12. The high R-squared value of 0.93 indicates that the model explains approximately 93% of the variability in median home prices, suggesting a strong relationship between the predictor variables and the observed outcomes. Additionally, the Root Mean Squared Error (RMSE) of USD37,148.29 reflects the average magnitude of the errors in the model's predictions, providing a measure of the model's accuracy. This somewhat-high metric relative to other elements of the model's performance is indicative of some outlier tracts, which will be discussed below. Overall, these metrics indicate that the model performs well in predicting median home prices, with a high level of explanatory power and relatively low prediction errors. 
 
-# Mean Absolute Error
+## Mean Absolute Error
 
-To find out goodness of fit, Mean Error for each fold across each
-regression is derived by subtracting predicted values from observed
-Median House Values in 2018. Subsequently, Mean Absolute Error and
-Standard deviation of MAE are added. The graph identifies census tracts
-where the higher errors occur. While Most errors at located around zero,
-some have created a right-skewed tail.
+To find out goodness of fit, Mean Error for each fold across each regression is derived by subtracting predicted values from observed Median House Values in 2018. Therefore, the Mean Absolute Error determines, on average, the degree to which the model erred in its prediction of 2018 median home values by Census tract. Subsequently, Mean Absolute Error and Standard deviation of MAE are added. The graph identifies census tracts where the higher errors occur. While Most errors at located around zero, some have created a right-skewed tail.
 
 ```{r}
 # Extract the Out-of-Fold (OOF) predictions from the cross-validated model
@@ -612,29 +569,11 @@ ggplot(oof_data, aes(x = OOF_Error)) +
   theme_minimal()
 ```
 
-Interpretation
+The majority of tracts' MAE for the model are close to zero, with some large underpredictions. This indicates that the model predicts median 2018 home values quite well for most tracts. Later analysis will determine that these underpredictions are largely in high-value neighborhoods.
 
-# Goodness of fit metrics
+## Goodness of Fit Metrics (Test Summary)
 
-talking about the results of regression text from Fichman paper: The
-“MAPE” or mean absolute percentage error, is the absolute value of the
-average error (the difference between observed and predicted prices by
-tract) represented as a percentage which allows for a more consistent
-way to describe model error across cities.
-
-The Standard Deviation of R-Squared measures over-prediction. Using
-cross-validation, each time the model is estimated with another set of
-randomly drawn observations, we can record goodness of fit. If the model
-is truly generalizable to the variation in our Legacy City sample, then
-we should expect consistent goodness of fit across each permutation.
-
-If the model is inconsistent across each permutation, it may be that the
-goodness of fit is driven solely by individual observations drawn at
-random. This latter outcome might indicate overfitting. Thus, this
-metric collects R\^2 statistics for each random permutation and then
-uses standard deviation to assess whether the variation in goodness of
-fit across each permutation is small (ie. generalizability) or a large
-(ie. overfitting).
+Measuring a model's overall goodness of fit is done using three key metrics in this analysis. The Mean Absolute Percentage Error (MAPE) provides a measure of the average error between observed and predicted prices represented as a percentage, offering a consistent way to describe model error across different cities. The Standard Deviation of R-Squared measures over-prediction by assessing the consistency of model goodness of fit across multiple permutations in cross-validation. Consistent goodness of fit across permutations suggests that the model's performance is generalizable to the variation in the dataset, while variability in goodness of fit may indicate overfitting, where the model's performance is driven by individual observations rather than capturing underlying patterns in the data.
 
 ```{r pred}
 # MAPE
@@ -663,50 +602,11 @@ results <- data.frame(Model = "reg2",
 print(results)
 ```
 
-summary statistics--compare to Fichman paper (lower RSE, MAPE than
-Fichman paper)
+While the Residual Standard Error and Adjusted R-Squared values have already been discussed, the Mean Absolute Percentage Error of 13.83% is fairly good when considering the amount of data and size of numbers being considered. Indeed, these figures are better than those found by [the model's counterparts](https://urbanspatialanalysis.com/portfolio/predicting-gentrification-using-longitudinal-census-data/).
 
-# Mean Absolute Percentage Error
+## Predicted vs Observed plot
 
-(x-axis (Observation): This represents the individual observations or
-data points in your dataset. Each point on the x-axis corresponds to a
-specific data point.
-
-y-axis (MAPE): This represents the Mean Absolute Percentage Error (MAPE)
-values. MAPE is a measure of prediction accuracy, typically used for
-forecasting models. It calculates the percentage difference between
-actual and predicted values.
-
-geom_line(): This function adds a line plot to the graph, connecting the
-MAPE values for each observation. This line gives an overview of how
-MAPE changes across different observations.
-
-geom_hline(): This function adds a horizontal dashed line at a specific
-y-value, which is represented by mape. This line is usually used as a
-reference, such as a threshold or target MAPE value.)- for understanding
-
-```{r}
-# Create a data frame with MAPE values
-mape_data <- data.frame(Observation = 1:length(absolute_error), MAPE = absolute_error)
-
-# Create plot for MAPE
-ggplot(mape_data, aes(x = Observation, y = MAPE)) +
-  geom_line() +  
-  geom_hline(yintercept = mape, linetype = "dashed", color = "red") +  
-  labs(x = "Observation", y = "Mean Absolute Percentage Error (MAPE)", title = "MAPE for Linear Regression Model") +
-  theme_minimal()
-```
-
-Interpretation
-
-# Predicted vs Observed plot
-
-Predicted prices as a function of observed prices for all tracts: If
-predictions were perfect, we would expect the below scatterplots to look
-like straight lines. most of the points are near the line, except for
-one, which is rittenhouse- the model predicts prives poorly for it.
-
-# Outlier is Rittenhouse
+Finally, to understand the model's performance by Census tract, the predicted prices as a function of observed prices is plotted for all tracts, with each appearing as a dot on the plot below. The dotted line in the scatter plot represents the line of perfect prediction, where the observed values perfectly match the predicted values. In other words, each point on this line represents a case where the model's prediction is exactly equal to the observed value. This line serves as a reference for assessing the accuracy of the model's predictions: points close to the line indicate accurate predictions, while points farther away suggest discrepancies between the observed and predicted values. The result sees most of the points positioned near the line, except for one, which is a Census tract comprising much of Rittenhouse Square, indicating the model predicts prices poorly for it but generally well for Philadelphia overall.
 
 ```{r predicted Med_Home_Val as a function of observed Med_Home_Val}
 
@@ -721,15 +621,15 @@ ggplot(plot_data, aes(x = Observed, y = Predicted)) +
 
 ```
 
-# Validating data using Baltimore
+Overall, high-value Census tracts seem to be underpredicted by the model, which performs fairly well for other areas. Given that the Census tracts which have very high observed median home values are likely either those in later stages of gentrification or that have yet to gentrify, a model whose primary intent is to predict gentrification has some leeway here when assessing its accuracy.
 
-# Data assembling
+# Data Validation: Baltimore
 
-(it took forever!) to explain the process- I combined the data and only
-kept the same columns as philly. converted the data into a dataframe
-from sf to remove NAs. And added the variable NborHouseVal for spatial
-lag that Tao had created for Philly. you can also talk about how the
-observations are smaller than Philly which might affect the accuracy.
+Baltimore, another large city in the Mid-Atlantic region with a similar history of urban growth, later decline, and urban renaissance, is used to evaluate the model's applicability to other cities in the focus area. The model is tested using this city's data to evaluate the same metric of median home values, as a proxy for gentrification.
+
+## Data Collection and Wrangling
+
+First, the data was sourced for Baltimore. This data was then combined with the pre-existing Philadelphia data, only keeping the same columns pre-existing in the later. To remove not-applicable values, the data was then converted to a dataframe from SF. Finally, a new variable "NborHouseVal" was added to represent spatial lag in this new context. Notably, the smaller number of observations in Baltimore, a city approximately one-third the size of Philadelphia, may affect model accuracy.
 
 ```{r}
 Balti_combined <- rbind(transform(Balti2010, year = 2010), 
@@ -781,29 +681,23 @@ Balti_combined$NborHouseVal <- lag.listw(Balti_combinedweights, Balti_combined$M
 
 ```
 
-# Regression
+## Regression
 
-Dropped geometry to run regression. Created regression in a similar way
-blah blah blah. Not as strong a association and significance as the
-Philly model, however a bigger adjusted r square (cross-check).
-
--   this is a simplified version of the Philadelphia model, which
-    doesn't include some local-level variables but does include a
-    spatial lag variable (which would need to be made for each city
-    before model application)
+In order to run a similar regression model in Baltimore, geometry was first dropped and then a model utilizing the local counterparts to variables created for the study's Philadelphia model was developed and tested.
 
 ```{r}
 Balti_combinedNoGeo <- Balti_combined %>%
   st_drop_geometry()
 reg3 <- lm(Med_House_Val_2018 ~ . -GEOID -Tract -year -Med_House_Val10 -White_Pop_2018 -White_Share_Change -Total_Pop_change, data = Balti_combinedNoGeo)
 summary(reg3)
-stargazer(reg2, type = "text")
-vif(reg2)
+stargazer(reg3, type = "text")
+vif(reg3)
 ```
+When compared with the model developed for Philadelphia, there is not as strong an association and significance in Baltimore when looking at the p-values for many of the associated variables and the degrees of freedom on the RSE, again perhaps due to the lower number of observations in the city. Notably, however, there is a bigger adjusted R-squared value (0.943) and a lower RSE value (USD20,589.77), indicating this model predicts 2018 median home values exceptionally well in Baltimore and that, if anything, the independent variables used in the model are even more adept in this context.
 
-# Similar curve- much closerto the line- lesser outlines- predicts exceptionally well
+## Evaluation
 
-likely fewer extremely high-value neighborhoods
+When plotting a similar curve of predicted prices as a function of observed prices where, once again, the dotted line in the scatter plot represents the line of perfect prediction, where the observed values perfectly match the predicted values, the model predicts exceptionall well. Most Census tracts' observed values are much closer to their predicted values, with far fewer outliers. Given the earlier analysis of the model's performance in Philadelphia, the fact that there are likely fewer extremely high-value neighborhoods in a city like Baltimore with fewer key industries and a smaller "eds and meds" presence likely improves the model's average prediction, with no high-value neighborhoods with extreme underpredictions by the model present.
 
 ```{r}
 # Obtain the predicted values from the model:
@@ -819,10 +713,9 @@ ggplot(plot_data, aes(x = Observed, y = Predicted)) +
   theme_minimal()  # Apply minimal theme
 ```
 
-# Map
+## Map
 
-visually illustrates the census tracts- can talked about the few areas
-it underpredicts for if you have local knowledge.
+To understand the spatial distribution of these predicted median home values and compare them to the 2018 actual observed data, two maps are created and displayed below.
 
 ```{r fig.height=8, fig.width=8}
 a1 <- ggplot()+
@@ -831,7 +724,7 @@ a1 <- ggplot()+
                        name = "Median House Value",
                        na.value = "#ebebeb",
                        guide = guide_colorbar(title.position = "top", title.hjust = 0.5,
-                                              title = "Predicted Home Values, In 2010 Dollars"))
+                                              title = "Observed, In 2010 Dollars"))
 
 a2 <- ggplot()+
   geom_sf(data = Balti_combined, aes(fill = predicted))+
@@ -839,16 +732,15 @@ a2 <- ggplot()+
                        name = "Median House Value",
                        na.value = "#ebebeb",
                        guide = guide_colorbar(title.position = "top", title.hjust = 0.5,
-                                              title = "Predicted Home Values, In 2010 Dollars"))
+                                              title = "Predicted, In 2010 Dollars"))
 
 grid.arrange(a1,a2, ncol =2)
 ```
 
+Generally, the prediction map (right) is very accurate when compared with the observed 2018 median home values (left). However, one can observe a instances of higher-value neighborhoods surrounded by lower-value ones, such as in Canton in central-east Baltimore, where there is some slight underprediction.
+
 # Conclusion
 
-pair your initial idea w/ spatial autocorrelation
+Overall, this model represents a fairly successful application of a predictive multivariate linear regression model to predict gentrification in neighborhoods using past Census data, using median home values by Census tract as a proxy for the phenomenon. The model examines existing data and its spatial distribution, before accounting for the phenomenon of endogenous gentrification may affect model results. Using spatial lag and local Moran's I statistics to understand how similar and different median home values by Census tract are grouped in a city and how this changes over time is important in later interpretation of a model's predictive accuracy. The model is then developed using statistical analysis best practices to rely on quantitative tests for evaluation and fit, and in application of variables. The model evaluation then involves both spatial and quantitative distribution analysis, before it is applied to another similar city, Baltimore, to validate its accuracy.
 
-talk about model limitations/disclaimers due to differing factors of
-gentrification - wouldn't work in Sunbelt, other portions of the country
-like Puerto Rico with very different factors driving neighborhood
-gentrification and desirability
+For a more nuanced understanding of the research's limitations and ramifications, please refer to the documentation outline brief.
